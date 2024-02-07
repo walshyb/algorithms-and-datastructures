@@ -8,7 +8,7 @@ Code samples are in Python, C++, and C (C when really a hashmap is not involved 
 
 Inclusions, thus far:
 
-- Arrays:
+- Arrays and Hashmaps:
     - Binary Search
     - Sliding Window
     - Two Sum
