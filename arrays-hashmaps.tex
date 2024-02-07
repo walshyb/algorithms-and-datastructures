@@ -15,7 +15,7 @@
 \usepackage{fancyhdr}
 \usepackage{extramarks}
 \usepackage{titlesec}
-
+\usepackage{hyperref}
 
 % Dracula colors, per dracula
 \definecolor{draculabg}      {RGB} {40,   42,   54}
@@ -67,6 +67,13 @@
 %\setlength{\droptitle}{-5em}
 % \setlength{\voffset}{-5em}
 
+% Color hyperlinks
+\hypersetup{
+	colorlinks=true,
+	urlcolor=draculacyan, % For hrefs
+	linkcolor=white % To keep the table of contents white
+}
+
 
 % Decrease space above chapters
 \titleformat{\chapter}[block]
@@ -75,7 +82,8 @@
 
 % Doc Data
 \title{\textbf{Arrays (and Hashmaps)}}
-\author{Ya boi, BWalsh }
+\author{Brandon W \\ \small Thanks to \href{https://github.com/dracula/latex}{Dracula} for the theme.}
+\date{}
 
 % Set default paragraph indent to 0
 \setlength{\parindent}{0pt}
