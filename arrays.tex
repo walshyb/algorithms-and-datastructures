@@ -1,0 +1,506 @@
+\documentclass[12pt, letterpaper]{report}
+\usepackage[a4paper,
+            bindingoffset=0.2in,
+            left=1in,
+            right=1in,
+            top=1in,
+            bottom=1in,
+            footskip=.25in]{geometry}
+\usepackage{graphicx} % Required for inserting images
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{color}
+\usepackage[T1]{fontenc}
+\usepackage{inconsolata}
+\usepackage{fancyhdr}
+\usepackage{extramarks}
+\usepackage{titlesec}
+
+
+% Dracula colors, per dracula
+\definecolor{draculabg}      {RGB} {40,   42,   54}
+\definecolor{draculacl}      {RGB} {68,   71,   90}
+\definecolor{draculafg}      {RGB} {248,  248,  242}
+\definecolor{draculacomment} {RGB} {98,   114,  164}
+\definecolor{draculacyan}    {RGB} {139,  233,  253}
+\definecolor{draculagreen}   {RGB} {80,   250,  123}
+\definecolor{draculaorange}  {RGB} {255,  184,  108}
+\definecolor{draculapink}    {RGB} {255,  121,  198}
+\definecolor{draculapurple}  {RGB} {189,  147,  249}
+\definecolor{draculared}     {RGB} {255,  85,   85}
+\definecolor{draculayellow}  {RGB} {241,  250,  140}
+\pagecolor{draculabg}
+\color{draculafg}
+
+
+% Header and footer syles
+\newcommand{\sectionTop}[1]{
+   \heading{#1}
+   \sectionContinue{#1}
+
+   \renewcommand{\sectionContinue}[1]{
+        \afterpage{
+           \heading{#1 Continued}
+           \sectionContinue{#1}
+        }
+   }
+}
+
+\fancypagestyle{plain}{%
+  \fancyhf{}%
+  \renewcommand{\headrulewidth}{0.4pt}%
+  \renewcommand{\footrulewidth}{0.4pt}%
+  \fancyhead[R]{\itshape\nouppercase{\rightmark}}%
+  \fancyfoot[C]{\thepage}
+}
+\fancypagestyle{general}{%
+  \fancyhf{}%
+  \renewcommand{\headrulewidth}{0.4pt}%
+  \renewcommand{\footrulewidth}{0.4pt}%
+  \fancyhead[R]{\itshape\nouppercase{\rightmark}}%
+  \fancyfoot[C]{\thepage}
+}
+\pagestyle{general}
+
+% Remove space above title
+\usepackage{titling}
+%\setlength{\droptitle}{-5em}
+% \setlength{\voffset}{-5em}
+
+
+% Decrease space above chapters
+\titleformat{\chapter}[block]
+  {\normalfont\huge\bfseries}{\chaptertitlename\ \thechapter{: }}{20pt}{\Huge}
+\titlespacing*{\chapter}{0pt}{-40pt}{40pt}
+
+% Doc Data
+\title{\textbf{Arrays (and Hashmaps)}}
+\author{Ya boi, BWalsh }
+
+% Set default paragraph indent to 0
+\setlength{\parindent}{0pt}
+
+% Code styling
+%\definecolor{bluekeywords}{rgb}{0.13,0.13,1}
+%\definecolor{greencomments}{rgb}{0,0.5,0}
+%\definecolor{redstrings}{rgb}{0.9,0,0}
+\lstset{language={Python},
+  showspaces=false,
+  showtabs=false,
+  breaklines=true,
+  showstringspaces=false,
+  breakatwhitespace=true,
+  escapeinside={(*@}{@*)},
+  commentstyle=\color{draculagreen},
+  stringstyle=\color{draculared},
+	identifierstyle=\color{white},
+	numberstyle=\color{draculacomment},
+  basicstyle=\ttfamily,
+  literate = *{\ \ }{\ }1,
+	emph={string,int,char,double,float,unsigned,void,bool},
+    emphstyle={\color{draculacyan}},
+		otherkeywords={>,<,.,;,-,!,=,~,&,|},
+    keywordstyle=\color{draculapink},
+		alsodigit={-},
+}
+
+% Also code styling, but highlights digits
+\usepackage{etoolbox}
+\newtoggle{InString}{}% Keep track of if we are within a string
+\togglefalse{InString}% Assume not initally in string
+
+\newcommand*{\ColorIfNotInString}[1]{\iftoggle{InString}{#1}{\color{draculaorange}#1}}%
+\newcommand*{\ProcessQuote}[1]{#1\iftoggle{InString}{\global\togglefalse{InString}}{\global\toggletrue{InString}}}%
+\lstset{literate=%
+    {0}{{{\ColorIfNotInString{0}}}}1
+    {1}{{{\ColorIfNotInString{1}}}}1
+    {2}{{{\ColorIfNotInString{2}}}}1
+    {3}{{{\ColorIfNotInString{3}}}}1
+    {4}{{{\ColorIfNotInString{4}}}}1
+    {5}{{{\ColorIfNotInString{5}}}}1
+    {6}{{{\ColorIfNotInString{6}}}}1
+    {7}{{{\ColorIfNotInString{7}}}}1
+    {8}{{{\ColorIfNotInString{8}}}}1
+    {9}{{{\ColorIfNotInString{9}}}}1
+}
+
+\begin{document}
+
+\maketitle
+
+\tableofcontents
+
+\chapter{Overview}
+
+\section{Arrays}
+\subsection{Big-O Notation}
+\begin{itemize}
+    \item \textbf{Space}: \(O(n)\)
+    \item \textbf{Search}: \(O(n)\)
+    \item \textbf{Access}: \(O(1)\)
+    \item \textbf{Insertion}: \(O(n)\)
+    \item \textbf{Deletion}: \(O(n)\)
+\end{itemize}
+
+\subsection{Creation}
+
+\begin{lstlisting}[language=Python,caption={Arrays in Python}]
+    # Create empty list
+    my_nums = []
+
+    # Create list with values
+    my_nums = [5,6,7]
+
+    # Create list from string
+    chars = list('Hello')
+    # chars => ['h', 'e', 'l', 'l', 'o']
+
+    # List from set
+    unique_set = set(1,2,3)
+    unique_list = list(unique_set)
+    # unique_list => [1, 2, 3]
+
+    // Size of unique_list
+    arrLen = len(unique_list)
+\end{lstlisting}
+
+\pagebreak
+
+\begin{lstlisting}[language=C,caption={Arrays in C}]
+    int main() {
+        // Create array with fixed size
+        int array[5];
+        array = {0, 1, 2, 3, 4};
+
+        // Or in one fell swoop
+        int array2[5] = {0, 1, 2, 3, 4};
+
+        // With chars
+        char myString = "Hello World";
+
+        // Array with 5 items with malloc()
+        int *myInts = (int) malloc(sizeof(int) * 5);
+
+        // Size of myInts
+        int arrLen = sizeof(myInts) / sizeof(myInts[0]);
+    }
+    
+\end{lstlisting}
+
+\vspace{\baselineskip} % Add a blank line or adjust the space as needed
+
+
+\begin{lstlisting}[language=C++, caption={Arrays in C++}]
+    #include <vector>
+    #include <string>
+    using namespace std;
+    
+    int main() {
+        // Create a vector (a list) of strings
+        vector<string> myStrings{ "hello", "world" };
+
+        // Create a vector and add items after
+        vector<int> myInts;
+        myInts.push_back(7);
+        myInts.push_back(2);
+
+        // Size of myInts
+        int arrLen = myInts.size();
+
+        return 0;
+    }
+    
+\end{lstlisting}
+
+\pagebreak
+\section{Hashmaps}
+\subsection{Big-O Notation}
+
+\begin{itemize}
+    \item \textbf{Space}: \(O(n)\)
+    \item \textbf{Get (Access)}: \(O(1)\)
+    \item \textbf{Contains Key (Access)}: \(O(1)\)
+    \item \textbf{Insertion}: \(O(1)\)
+    \item \textbf{Delete Key}: \(O(1)\)
+\end{itemize}
+
+\subsection{Creation}
+
+\begin{lstlisting}[language=Python,caption={Dicts (maps) in Python}]
+    # Create empty dict
+    fruits = {}
+
+    # Add item to dict
+    fruits['apple'] = 7
+
+    # Create dict with items in it
+    fruits = {
+        'apple': 10,
+        'banana': 2
+    }
+
+    # Create dict with 'dict' builtin func
+    cat_names = dict(one='Ham', two='Beanbag')
+    print(cat_names['two']) # => Beanbag
+
+    # You can set a default value for keys 
+    # using a default dict so you don't
+    # get an error when trying to access
+    # an undefined key. 
+    #
+    # This is very helpful for
+    # frequency lists.
+    from collections import defaultdict
+
+    values = defaultdict(int)
+    values['a'] = 10
+
+    print(values['a']) # => 10
+    print(values['b']) # => 0
+\end{lstlisting}
+
+\pagebreak
+
+\begin{lstlisting}[language=C++,caption={Maps in C++}]
+    #include <map>
+    #include <string>
+    #include <iostream>
+    using namespace std;
+
+    int main() {
+
+        map<string, int> fruits;
+        fruits.insert(pair<string,int>("Apples", 10));
+        fruits.insert(pair<string,int>("Bananas", 2));
+
+        // Fetch specific value
+        map<string,int>::iterator it;
+        it = fruits.find("Apples");
+
+        cout << it->first << ": " << it->second;
+        // => Apples: 10
+
+        return 0;
+    }
+\end{lstlisting}
+
+\pagebreak
+\chapter{Algorithms}
+\section{Binary Search}
+
+Binary Search is a popular algorithm often used to find a target in an already-sorted list. The methodology goes as such:
+
+\begin{itemize}
+    \item Create two variables that will act as a \textbf{left pointer}  and a \textbf{right pointer}, with \lstinline{left} initialized to 0 to represent the beginning of the array and \lstinline{right} initialized to the last index of the array (size - 1)
+    \item Start a while-loop for condition \lstinline{left <= right}
+    \item{Calculate the middle index between \lstinline{left} and \lstinline{right}: 
+        \newline 
+        \lstinline{middle = left + (right - left) / 2}
+    }
+    \item Check if we found target, if so return
+    \item{Check if current middle item is smaller than target. If so, discard the smaller (left-hand) half, and set our left pointer to 1 after the middle: \newline
+        \lstinline{left = middle + 1}
+    }
+    \item{Otherwise, our current item is larger than the target. So we discard the larger half, and set our right pointer to 1 less than the middle: \newline
+        \lstinline{right = middle - 1}
+    }
+\end{itemize}
+
+The time complexity is $O(log(n))$. This is because at every iteration of the loop, we are halving what part of the array we're looking at. 
+
+\begin{lstlisting}[language=Python,caption={Binary Search In Python}]
+    def binary_search(items, target):
+        left = 0
+        right = len(items) - 1
+    
+        while left <= right:
+            # // in Python rounds to the nearest integer
+            mid = (left + right) // 2
+    
+            if items[mid] == target:
+                return mid
+            elsif items[mid] < target:
+                left = mid + 1
+            else items[mid] > target:
+                right = mid - 1
+                
+        return -1
+
+    binary_search([2,3,4,5,6,7,8,9], 3)
+\end{lstlisting}
+
+\begin{lstlisting}[language=C++,caption={Binary Search In C++}]
+    int binary_search(vector<int>& items, int target) {
+        int left = 0;
+        int right = items.size() - 1;
+    
+        while (left <= right):
+            int mid = left + (right - left) / 2;
+    
+            if(items[mid] == target) {
+                return mid;
+            } else if (items[mid] < target) {
+                left = mid + 1;
+            } else (items[mid] > target) {
+                right = mid - 1;
+            }
+                
+        return -1;
+    }
+\end{lstlisting}
+
+\pagebreak
+\section{Sliding Window}
+
+Sliding Window is a technique used to search or traverse an array while looking at a subsection of the array (a "window") at a time. The goal of sliding window algorithms is to minimize nested loops and reduce their time complexities. These algorithms are used often for the following types of problems:
+
+\begin{itemize}
+    \item Minimum / Maximum Sum Array
+    \item Longest Sequence / Substring
+    \item K Closest Elements
+\end{itemize}
+
+
+Assume we have a problem where we want to find the largest subarray in a given array:
+\begin{lstlisting}[language=Python,caption={Sliding Window In Python}]
+    # k is the target size of the subarray
+    def maximum_subarray(nums, k):
+        # Set the current maximum to lowest number
+        max_sum = float('-inf')
+
+        # Keep track of local sums
+        current_sum = 0
+
+        # Calculate the initial max sum
+        # in the first window (first k items)
+        for i in range(k):
+            current_sum += nums[i]
+
+        # Loop through the rest of array
+        for i in range(k, len(nums)):
+            # Update the largest subarray that we've seen
+            max_sum = max(max_sum, current_sum)
+
+            # Add the current num to the current_sum
+            # Subtracting the first item from the last window
+            current_sum += nums[i] - nums[i - k]
+
+        return max_sum
+        
+
+    maximum_subarray([5,8,3,6,9,1,0,9], 3)
+
+
+    """
+    So for the above example, we effectively end up seeing:
+
+    Step 1:
+    Our window is [5,8,3], the first k elements.
+    The pointer is at index 3 (value of k), but we only look
+    at the values before that (exclusive).
+    
+    [5, 8, 3, 6, 9, 1, 0, 9]
+     ^        ^
+     |        |
+   left     right
+
+    Subarray (window) sum: 5 + 8 + 3 = 16
+
+    Step 2:
+    [5, 8, 3, 6, 9, 1, 0, 9]
+        ^        ^
+        |        |
+      left     right
+  """
+\end{lstlisting}
+
+\pagebreak
+\begin{lstlisting}[language=C,caption={Sliding Window In C}]
+    #include <stdio.h>
+
+    int maximumSubarray(int* nums, int numsSize, int target);
+    int max(int, int);
+    
+    int main() {
+      int nums[8] = {5, 8, 3, 6, 9, 1, 0, 9};
+      int numsSize = sizeof(nums) / sizeof(int);
+      int maxSum = maximumSubarray(nums, numsSize, 3);
+      printf("Maximum sub in subarray: %d", maxSum);
+    }
+    
+    int maximumSubarray(int* nums, int numsSize, int k) {
+      int maxSum = -__INT_MAX__;
+      int currentSum = 0;
+    
+      for (int i = 0; i < k; i++) {
+        currentSum += nums[i];
+      }
+    
+      for (int i = k; i < numsSize; i++) {
+        maxSum = max(maxSum, currentSum);
+    
+        currentSum += nums[i] - nums[i - k];
+      }
+    
+      return maxSum;
+    }
+    
+    int max(int a, int b) {
+      if (a > b)
+        return a;
+      return b;
+    }
+\end{lstlisting}
+
+\pagebreak
+\section{Two Sum}
+The two sum algorithm is a simple one used when needing to find if two numbers in a list can be added to equate to a given target.\newline
+
+For the simplest form of two sum (exemplified below), the algorithm goes as such:
+
+\begin{itemize}
+    \item Loop through input
+    \item Calculate the difference between the current item and the target
+    \item If the complement is in the hashmap, return the current index and the index of the complement
+    \item Add the current number to a hashmap as a key, who's value is the index
+\end{itemize}
+
+This can be done in $O(n)$ time. The reason this works is because at every iteration of our loop, we're seeing if we already came across a number (an appropriate complement of the current number) that will make the current number equal our target when added together. 
+
+\begin{lstlisting}[language=Python, caption={Two Sum in Python}]
+    def two_sum(nums, target):
+        complements = {}
+        for i in range(len(arr)):
+            diff = target - nums[i]
+    
+            if diff in complements:
+                return [i, complements[diff]]
+            complements[nums[i]] = i
+
+    two_sum([9,6,11,15], 17)
+    
+\end{lstlisting}
+
+\begin{lstlisting}[language=C++, caption={Two Sum in C++}]
+    vector<int> twoSum(vector<int>& nums, int target) {
+        map<int, int> complements;
+        vector<int> result;
+
+        for(int i = 0; i < nums.size(); i++) {
+          if (complements.count(target - nums[i]) > 0) {
+            return {i, complements[target - nums[i]]};
+          }
+          complements.insert(pair<int,int>(nums[i], i));
+        }
+
+        return {-1, -1};
+    }
+\end{lstlisting}
+
+\pagebreak
+\section{Top K Frequent Elements}
+
+
+
+\end{document}
+
