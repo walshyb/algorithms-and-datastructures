@@ -49,25 +49,20 @@
 
 % Remove space above title
 \usepackage{titling}
-%\setlength{\droptitle}{-5em}
-% \setlength{\voffset}{-5em}
 
-% Color hyperlinks
-\hypersetup{
-	colorlinks=true,
-	urlcolor=blue, % For hrefs
-	linkcolor=white % To keep the table of contents white
-}
+% Style section headers
+\usepackage{sectsty}
+\sectionfont{\color{ctpBlue}}
+\subsectionfont{\color{ctpSky}}
 
-
-% Decrease space above chapters
+% Decrease space above chapters and color
 \titleformat{\chapter}[block]
-  {\normalfont\huge\bfseries}{\chaptertitlename\ \thechapter{: }}{20pt}{\Huge}
+{\normalfont\huge\bfseries\color{ctpMaroon}}{\chaptertitlename\ \thechapter{: }}{20pt}{\Huge}
 \titlespacing*{\chapter}{0pt}{-40pt}{40pt}
 
 % Doc Data
 \title{\textbf{\textcolor{ctpPink}{Arrays (and Hashmaps)}}}
-\author{Brandon W}
+\author{\textbf{\color{ctpGreen}{Brandon W}}}
 \date{}
 
 % Set default paragraph indent to 0
